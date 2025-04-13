@@ -1,0 +1,77 @@
+Step by Step to "Reproduce" the works in this Nature paper:
+https://www.nature.com/articles/s44386-025-00007-4?utm_source=rct_congratemailt&utm_medium=email&utm_campaign=oa_20250402&utm_content=10.1038/s44386-025-00007-4
+
+💫 Harnessing DNA-Encoded Libraries and Machine Learning for Efficient Hit Drug Discovery: A Benchmark Study Across DEL + ML Combinations
+
+🧪 Study Focus: Combining DEL and ML for Drug Discovery
+
+The goal of this study was to evaluate how well DNA-Encoded Libraries (DELs) and Machine Learning (ML) models work together to discover potential drug candidates, also known as “hits.” Specifically, they wanted to know which combinations of DELs and ML models are most effective for predicting molecules that bind to a drug target.
+
+👉 Part 1: Installation
+
+conda env create --name del-ml-gpu -f ./docs/environment_gpu.yml
+
+conda activate del-ml-gpu
+
+Pre-requisites:
+
+Linux (Tested on Ubuntu 22.04)
+
+NVIDIA GPU (Tested on NVIDIA RTX A6000 with cuda version 12.1)
+
+Python (3.10)
+
+Tensorflow (2.14)
+
+chemprop (1.6.1)
+
+RDkit (2023.9.2)
+
+Pytorch (2.1.1)
+
+👉 Part 2: Test codes
+
+💫 Step 1: Feature extraction
+
+python feature_extractor.py --input_file ./example/compound.csv --save_path ./example/ --experiment compound_feature
+
+💫  Results of the test:
+
+~/Documents/Truong/DEL-ML-Refactor/example$ ls -l
+
+-> Output file: compound_feature.h5
+
+💫 Step 2: Binder/Non-binder Prediction
+
+1. Multi-layer perceptron (MLP)
+
+💫 python prediction.py --input_file ./example/compound_feature.h5 --save_path ./example/ --experiment compound_pred_mlp --checkpoint ./data/HitGen/models/CK1a/MLP.keras
+
+💫 python prediction.py --input_file ./example/compound_feature.h5 --save_path ./example/ --experiment compound_pred_mlp --checkpoint ./data/HitGen/models/CK1a/MLP.keras --use_gpu
+
+-> Output file: compound_pred_mlp.csv
+
+2. Graph neural network (GNN)
+
+💫 chemprop_predict --smiles_columns SMILES --test_path ./example/compound.csv --checkpoint_path data/HitGen/models/CK1a/chemprop.pt --preds_path ./example/compound_prediction_chemprop.csv
+
+-> Output file: Apr 13 12:50 compound_prediction_chemprop.csv
+~/Documents/Truong/DEL-ML-Refactor/example$ head compound_prediction_chemprop.csv
+SMILES,Metadata,label
+CCN1CCCC1Cn1cnc2c3ccc(OC)cc3nc-2c1O,CHEMBL1306957,0.8069143295288086
+CCC1(c2ccccc2)CC(=O)C(C2CC(c3ccc(OCc4ccc(C(F)(F)F)cc4)cc3)Cc3ccccc32)=C(O)O1,CHEMBL186721,0.618036150932312
+CCOC(=O)C(C)(OC(C)=O)c1cc(C)c(/N=C/N(C)C)c(C)c1,CHEMBL54249,0.657230019569397
+Cc1cc(C)n2s/c(=N\C(=O)C(c3ccc(Cl)cc3)C(C)C)nc2n1,CHEMBL2286205,0.5125857591629028
+OC1=C(Cl)/C(=N\Cc2ccccc2)C(O)O1,CHEMBL360995,0.500333309173584
+
+💫 Step 3: t-SNE visualization
+
+python tsne.py --input_file ./example/compound.h5 --save_path ./example/ --experiment compound --perplexity 2
+
+or 
+
+python tsne.py --input_file ./example/compound.h5 --save_path ./example/ --experiment compound --perplexity YOUR_VALUE
+
+-> Output file: 189 Apr 13 12:55 data_embedded_compound.pkl
+
+💫 I also wrote a simple customized script to visualize the pkl file result from t-SNE (Script_to_visualize_tSNE.py in this same repository)
