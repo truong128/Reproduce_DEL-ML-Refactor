@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 
 # === Load t-SNE embedding ===
-with open("/Volumes/FlemingtonLab4v2/Truong2/Akata_Cntl_1_hicpro2fithic/data_embedded_compound.pkl", "rb") as f:
+with open("~/data_embedded_compound.pkl", "rb") as f:
     tsne_data = np.array(pickle.load(f))
 
 # === Load prediction results ===
-pred_df = pd.read_csv("/Volumes/FlemingtonLab4v2/Truong2/Akata_Cntl_1_hicpro2fithic/compound_pred_mlp.csv")  # or use the chemprop one
+pred_df = pd.read_csv("~/compound_pred_mlp.csv")  # or use the chemprop one
 pred_labels = pred_df['prediction'].values  # 0 = non-binder, 1 = binder
 
 # Safety check: must match number of t-SNE points
